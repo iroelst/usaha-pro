@@ -19,6 +19,10 @@ label{display:block;font-size:13px;font-weight:750;margin:15px 0 7px}input,selec
 .connector-section{margin-top:30px}.connector-heading{display:flex;justify-content:space-between;align-items:flex-end;gap:14px;flex-wrap:wrap;margin-bottom:15px}.connector-heading h2{margin:0;color:var(--navy);font-size:21px}.connector-heading p{margin:6px 0 0;color:var(--muted);font-size:13px;line-height:1.6}.connector-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:15px}.connector-card{background:#fff;border:1px solid var(--line);border-radius:18px;padding:20px;box-shadow:var(--shadow);display:flex;flex-direction:column;min-width:0}.connector-top{display:flex;align-items:flex-start;gap:13px}.connector-icon{width:52px;height:52px;border-radius:15px;background:#e7f5eb;color:#197348;display:grid;place-items:center;font-size:26px;flex:none}.connector-card h3{margin:2px 0 5px;color:var(--navy);font-size:17px}.connector-card p{margin:0;color:var(--muted);font-size:13px;line-height:1.6}.connector-status{display:inline-flex;align-items:center;gap:7px;border-radius:99px;background:#fff6e5;color:#946200;padding:6px 10px;font-size:11px;font-weight:800;margin-top:16px;width:max-content}.connector-status:before{content:"";width:6px;height:6px;border-radius:50%;background:currentColor}.connector-status.connected{background:#e8f8ef;color:#18794e}.connector-status.failed{background:#fff0ef;color:#b42318}.connector-actions{display:flex;gap:9px;margin-top:16px}.connector-actions button{flex:1}.connector-card.muted{background:#fbfdff;border-style:dashed}.connector-card.muted .connector-icon{background:#eef2f7;color:#718096}.connector-note{margin-top:14px;background:#eef5fc;border:1px solid #d5e5f5;border-radius:12px;padding:13px 15px;color:#365978;font-size:12px;line-height:1.65}
 @media(max-width:850px){.layout{grid-template-columns:1fr}.hero{min-height:320px;padding:29px}.card{padding:26px}.appgrid{grid-template-columns:repeat(2,minmax(0,1fr))}.top{position:static}}
 @media(max-width:560px){.connector-grid{grid-template-columns:1fr}.connector-heading{align-items:stretch}.connector-actions{flex-direction:column}.connector-actions button{width:100%}main{margin:20px auto;padding:0 14px}.top{padding:11px 14px}.tag{display:none}.stats{grid-template-columns:1fr;gap:10px}.stat{padding:16px}.stat strong{font-size:22px}.appgrid{grid-template-columns:1fr}.sectionhead{align-items:stretch}.sectionhead button{width:100%;justify-content:center}.dashhead .right{width:100%}.dashhead .right button{flex:1}.formgrid{grid-template-columns:1fr}.formgrid .wide{grid-column:auto}.hero h1{font-size:35px}}
+
+.finance-section{margin-top:30px}.finance-toolbar{display:flex;align-items:flex-end;justify-content:space-between;gap:12px;flex-wrap:wrap;margin:0 0 15px}.finance-toolbar h2{margin:0;color:var(--navy);font-size:21px}.finance-toolbar p{margin:6px 0 0;color:var(--muted);font-size:13px}.finance-filters{display:flex;gap:8px;align-items:flex-end;flex-wrap:wrap}.finance-filters label{margin:0 0 5px;font-size:11px;color:var(--muted)}.finance-filters select,.finance-filters input{padding:10px;font-size:12px;min-width:120px}.finance-filters button{padding:10px 13px}.finance-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:13px}.finance-card{background:#fff;border:1px solid var(--line);border-radius:16px;padding:17px;box-shadow:var(--shadow);min-width:0}.finance-card .f-label{color:var(--muted);font-size:12px}.finance-card .f-value{font-size:clamp(18px,2vw,24px);font-weight:850;color:var(--navy);margin-top:9px;overflow-wrap:anywhere}.finance-card .f-foot{font-size:11px;color:var(--muted);margin-top:6px}.finance-card.received .f-value{color:#18794e}.finance-card.due .f-value{color:#b7791f}.finance-card.expense .f-value{color:#b42318}.finance-help{margin-top:12px;padding:12px 14px;background:#eef5fc;border:1px solid #d5e5f5;border-radius:12px;color:#365978;font-size:12px;line-height:1.6}.finance-error{background:#fff0ef;border-color:#ffd7d2;color:#b42318}
+@media(max-width:850px){.finance-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}@media(max-width:560px){.finance-grid{grid-template-columns:1fr 1fr}.finance-filters{width:100%}.finance-filters>div{flex:1;min-width:calc(50% - 8px)}.finance-filters select,.finance-filters input{width:100%;min-width:0}.finance-filters button{width:100%}.finance-card{padding:13px}.finance-card .f-value{font-size:18px}}
+
 </style>
 </head>
 <body>
@@ -46,6 +50,29 @@ label{display:block;font-size:13px;font-weight:750;margin:15px 0 7px}input,selec
     <div class="connector-note"><strong>Keamanan koneksi:</strong> Worker akan memverifikasi login Usaha Pro dan akun e-Kasir, lalu menyimpan koneksi yang sudah diverifikasi. Data operasional e-Kasir dibaca saja; aplikasi ini tidak mengubah transaksi e-Kasir.</div>
     <div id="connectorMessage" class="message" role="status"></div>
   </section>
+
+  <section class="finance-section" aria-labelledby="financeTitle">
+    <div class="finance-toolbar"><div><h2 id="financeTitle">Ringkasan Keuangan e-Kasir</h2><p>Ringkasan saja, tanpa rincian transaksi. Data diambil dari e-Kasir secara baca-saja.</p></div>
+      <div class="finance-filters">
+        <div><label for="financePeriod">Periode</label><select id="financePeriod"><option value="today">Hari ini</option><option value="month" selected>Bulan ini</option><option value="custom">Rentang tanggal</option></select></div>
+        <div id="financeStartWrap" class="hidden"><label for="financeStart">Dari tanggal</label><input type="date" id="financeStart"></div>
+        <div id="financeEndWrap" class="hidden"><label for="financeEnd">Sampai tanggal</label><input type="date" id="financeEnd"></div>
+        <button id="financeRefreshBtn" type="button">Tampilkan</button>
+      </div>
+    </div>
+    <div class="finance-grid">
+      <article class="finance-card"><div class="f-label">Omzet penjualan</div><div class="f-value" id="finOmzet">—</div><div class="f-foot" id="finTransactions">Menunggu data</div></article>
+      <article class="finance-card received"><div class="f-label">Uang diterima</div><div class="f-value" id="finReceived">—</div><div class="f-foot">Pembayaran yang sudah masuk</div></article>
+      <article class="finance-card due"><div class="f-label">Sisa tagihan</div><div class="f-value" id="finDue">—</div><div class="f-foot">Nilai yang belum dibayar</div></article>
+      <article class="finance-card"><div class="f-label">Total HPP</div><div class="f-value" id="finHpp">—</div><div class="f-foot">Harga pokok penjualan</div></article>
+      <article class="finance-card"><div class="f-label">Laba kotor</div><div class="f-value" id="finGross">—</div><div class="f-foot">Omzet dikurangi HPP</div></article>
+      <article class="finance-card expense"><div class="f-label">Pengeluaran</div><div class="f-value" id="finExpenses">—</div><div class="f-foot">Pengeluaran periode terpilih</div></article>
+      <article class="finance-card received"><div class="f-label">Laba bersih</div><div class="f-value" id="finNet">—</div><div class="f-foot">Laba kotor dikurangi pengeluaran</div></article>
+      <article class="finance-card"><div class="f-label">Jumlah transaksi</div><div class="f-value" id="finCount">—</div><div class="f-foot">Periode terpilih</div></article>
+    </div>
+    <div id="financeMessage" class="finance-help" role="status">Hubungkan e-Kasir lalu pilih periode untuk memuat ringkasan.</div>
+  </section>
+
   <div class="sectionhead"><div><h2>Manajemen Aplikasi</h2><p>Daftarkan aplikasi, ubah detail, atau buka aplikasi dari sini.</p></div><button id="addBtn" type="button">＋ Tambah Aplikasi</button></div>
   <div id="appsLoading" class="loading">Memuat daftar aplikasi…</div><div id="appGrid" class="appgrid hidden"></div>
   <div id="dashMessage" class="message" role="status"></div>
@@ -151,6 +178,14 @@ async function removeApp(a){
 }
 
 function setEkasirStatus(status,text){const el=$("ekasirStatus");el.className="connector-status"+(status==="connected"?" connected":status==="failed"?" failed":"");el.textContent=text}
+function localDate(d=new Date()){const y=d.getFullYear(),m=String(d.getMonth()+1).padStart(2,"0"),day=String(d.getDate()).padStart(2,"0");return `${y}-${m}-${day}`}
+function financeRange(){const now=new Date(),mode=$("financePeriod").value;let start,end;if(mode==="today")start=end=localDate(now);else if(mode==="month"){start=localDate(new Date(now.getFullYear(),now.getMonth(),1));end=localDate(now)}else{start=$("financeStart").value;end=$("financeEnd").value}return {start,end}}
+function rupiah(v){return Number.isFinite(Number(v))?"Rp "+Number(v).toLocaleString("id-ID"):"—"}
+function firstNumber(obj,keys){for(const key of keys){if(obj[key]!==undefined&&obj[key]!==null&&obj[key]!=="")return Number(obj[key])}return null}
+function paintFinance(data){const fields={finOmzet:["omzet","totalOmzet","salesTotal"],finReceived:["uangDiterima","totalDiterima","paidTotal","received","totalPaid"],finDue:["sisaTagihan","totalTagihan","outstanding","unpaidTotal","dueTotal"],finHpp:["hpp","totalHpp","totalHPP"],finGross:["labaKotor","grossProfit"],finExpenses:["pengeluaran","totalPengeluaran","expensesTotal"],finNet:["labaBersih","netProfit"]};for(const [id,keys] of Object.entries(fields)){const n=firstNumber(data,keys);$(id).textContent=n===null?"—":rupiah(n)}const count=firstNumber(data,["transactionCount","jumlahTransaksi","totalTransaksi"]);$("finCount").textContent=count===null?"—":count.toLocaleString("id-ID");$("finTransactions").textContent=count===null?"Ringkasan periode terpilih":`${count.toLocaleString("id-ID")} transaksi pada periode ini`;const missing=Object.values(fields).some(keys=>firstNumber(data,keys)===null);$("financeMessage").className="finance-help";$("financeMessage").textContent=missing?"Data ringkasan berhasil dimuat, tetapi sebagian metrik belum disediakan endpoint Worker. Nilai yang belum tersedia ditampilkan sebagai — agar tidak menampilkan angka perkiraan.":"Ringkasan keuangan berhasil diperbarui."}
+async function loadFinanceSummary(){const btn=$("financeRefreshBtn");const {start,end}=financeRange();if(!start||!end){message($("financeMessage"),"Pilih tanggal awal dan akhir periode.");return}if(start>end){message($("financeMessage"),"Tanggal awal tidak boleh melewati tanggal akhir.");return}btn.disabled=true;btn.textContent="Memuat…";$("financeMessage").className="finance-help";$("financeMessage").textContent="Mengambil ringkasan keuangan…";try{const data=await workerRequest("/ekasir-summary?startDate="+encodeURIComponent(start)+"&endDate="+encodeURIComponent(end),{method:"GET"});paintFinance(data)}catch(e){$("financeMessage").className="finance-help finance-error";$("financeMessage").textContent=e.message||"Ringkasan belum dapat dimuat. Pastikan e-Kasir sudah terhubung.";for(const id of ["finOmzet","finReceived","finDue","finHpp","finGross","finExpenses","finNet","finCount","finTransactions"])$(id).textContent="—"}finally{btn.disabled=false;btn.textContent="Tampilkan"}}
+$("financePeriod").addEventListener("change",()=>{const custom=$("financePeriod").value==="custom";$("financeStartWrap").classList.toggle("hidden",!custom);$("financeEndWrap").classList.toggle("hidden",!custom);if(custom){const r=financeRange();$("financeStart").value=r.start;$("financeEnd").value=r.end}});
+$("financeRefreshBtn").addEventListener("click",loadFinanceSummary);
 function showConnectModal(){clearMessage($("connectFormMessage"));$("connectForm").reset();$("ekasirEmail").value="bumdes@ekasir.com";$("connectModal").classList.remove("hidden");$("ekasirEmail").focus()}
 function closeConnectModal(){$("connectModal").classList.add("hidden");$("ekasirPassword").value=""}
 async function workerRequest(path,options={}){
@@ -167,26 +202,26 @@ $("connectForm").addEventListener("submit",async event=>{
  event.preventDefault();const btn=$("submitConnectBtn");btn.disabled=true;btn.textContent="Memverifikasi…";clearMessage($("connectFormMessage"));setEkasirStatus("pending","Memverifikasi koneksi…");
  try{
   const result=await workerRequest("/connect-ekasir",{method:"POST",body:JSON.stringify({ekasirEmail:$("ekasirEmail").value.trim(),ekasirPassword:$("ekasirPassword").value})});
-  setEkasirStatus("connected","Terhubung");message($("connectorMessage"),result.message||"Akun e-Kasir berhasil diverifikasi dan dihubungkan.","ok");closeConnectModal();
+  setEkasirStatus("connected","Terhubung");message($("connectorMessage"),result.message||"Akun e-Kasir berhasil diverifikasi dan dihubungkan.","ok");closeConnectModal();await loadFinanceSummary();
  }catch(error){setEkasirStatus("failed","Verifikasi gagal");message($("connectFormMessage"),error.message||"Koneksi gagal. Periksa akun dan konfigurasi Worker.");}
  finally{btn.disabled=false;btn.textContent="Verifikasi & Hubungkan";$("ekasirPassword").value=""}
 });
 $("testEkasirBtn").addEventListener("click",async()=>{
  const btn=$("testEkasirBtn");btn.disabled=true;btn.textContent="Menguji…";
- try{const today=new Date();const d=today.toISOString().slice(0,10);const result=await workerRequest("/ekasir-summary?startDate="+d+"&endDate="+d,{method:"GET"});setEkasirStatus("connected","Terhubung");message($("connectorMessage"),"Koneksi berhasil. Transaksi hari ini: "+(result.transactionCount??0)+"; omzet: Rp "+(Number(result.omzet)||0).toLocaleString("id-ID"),"ok")}
+ try{const today=new Date();const d=today.toISOString().slice(0,10);const result=await workerRequest("/ekasir-summary?startDate="+d+"&endDate="+d,{method:"GET"});setEkasirStatus("connected","Terhubung");message($("connectorMessage"),"Koneksi berhasil. Transaksi hari ini: "+(result.transactionCount??0)+"; omzet: Rp "+(Number(result.omzet)||0).toLocaleString("id-ID"),"ok");await loadFinanceSummary()}
  catch(error){setEkasirStatus("failed","Belum terverifikasi");message($("connectorMessage"),error.message||"Belum ada koneksi aktif. Hubungkan e-Kasir terlebih dahulu.")}
  finally{btn.disabled=false;btn.textContent="Uji koneksi"}
 });
 $("loginForm").addEventListener("submit",async event=>{
  event.preventDefault();if(!auth)return;
  $("loginBtn").disabled=true;$("loginBtn").textContent="Memeriksa akun...";clearMessage($("message"));
- try{const credential=await signInWithEmailAndPassword(auth,$("email").value.trim(),$("password").value);await verifyOwner(credential.user);showDashboard(credential.user);await loadApps()}
+ try{const credential=await signInWithEmailAndPassword(auth,$("email").value.trim(),$("password").value);await verifyOwner(credential.user);showDashboard(credential.user);await loadApps();await loadFinanceSummary()}
  catch(e){if(auth.currentUser&&auth.currentUser.uid!==OWNER_UID)await signOut(auth);showLogin();message($("message"),e.code==="auth/invalid-credential"||e.code==="auth/wrong-password"?"Email atau kata sandi tidak sesuai.":e.code==="auth/too-many-requests"?"Terlalu banyak percobaan. Coba lagi nanti.":e.message||"Login atau pemeriksaan akses gagal.")}
  finally{$("loginBtn").disabled=false;$("loginBtn").textContent="Masuk ke Usaha Pro"}
 });
 onAuthStateChanged(auth,async user=>{
  if(!user){showLogin();return}
- try{await verifyOwner(user);showDashboard(user);await loadApps()}
+ try{await verifyOwner(user);showDashboard(user);await loadApps();await loadFinanceSummary()}
  catch(e){await signOut(auth);showLogin();message($("message"),"Akun tidak dapat diverifikasi sebagai Super Admin. Silakan masuk kembali.")}
 });
 $("logoutBtn").addEventListener("click",async()=>{await signOut(auth);showLogin()});
