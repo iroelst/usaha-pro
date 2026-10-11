@@ -1,0 +1,188 @@
+<!doctype html>
+<html lang="id">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="theme-color" content="#123d70">
+  <title>Usaha Pro — Super Admin</title>
+  <style>
+    :root{--navy:#123d70;--blue:#2367b2;--pale:#eef5fc;--ink:#172b43;--muted:#687b90;--line:#dce6f0;--white:#fff;--red:#b42318;--green:#18794e}
+    *{box-sizing:border-box}body{margin:0;font-family:Inter,system-ui,-apple-system,"Segoe UI",sans-serif;color:var(--ink);background:linear-gradient(145deg,#edf5fd 0%,#f7faff 48%,#eaf1f8 100%);min-height:100vh}
+    .top{height:72px;background:var(--white);border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;padding:0 max(22px,calc((100% - 1120px)/2));gap:16px}
+    .brand{display:flex;align-items:center;gap:12px;font-weight:800;color:var(--navy);font-size:19px}.logo{width:40px;height:40px;border-radius:12px;background:linear-gradient(145deg,#1d6bc1,#123d70);display:grid;place-items:center;color:#fff;font-size:20px;box-shadow:0 6px 16px #123d7028}
+    .tag{font-size:12px;color:var(--muted);background:var(--pale);border:1px solid var(--line);border-radius:99px;padding:7px 11px}
+    main{max-width:1120px;margin:42px auto;padding:0 20px}.layout{display:grid;grid-template-columns:1.05fr .95fr;gap:26px;align-items:stretch}
+    .hero{border-radius:24px;padding:42px;background:linear-gradient(150deg,#123d70,#1e65a7 70%,#2d80bd);color:#fff;position:relative;overflow:hidden;min-height:480px;display:flex;flex-direction:column;justify-content:space-between}
+    .hero:after{content:"";position:absolute;width:340px;height:340px;border:1px solid #ffffff28;border-radius:50%;right:-115px;top:-85px;box-shadow:0 0 0 35px #ffffff0a,0 0 0 70px #ffffff08}
+    .eyebrow{text-transform:uppercase;letter-spacing:2px;font-size:11px;font-weight:800;color:#cfe4ff}.hero h1{font-size:clamp(32px,4vw,48px);line-height:1.08;letter-spacing:-1.4px;margin:18px 0}.hero p{color:#e0edfb;line-height:1.75;max-width:420px}.features{display:grid;gap:12px;margin-top:28px}.feature{display:flex;gap:12px;align-items:center;color:#eff7ff;font-size:14px}.check{width:26px;height:26px;border-radius:8px;background:#ffffff20;display:grid;place-items:center}
+    .card{background:#fff;border:1px solid #dbe5ef;border-radius:24px;padding:34px;box-shadow:0 18px 55px #14385d0b;align-self:center;width:100%}.card h2{margin:0 0 8px;font-size:25px;color:var(--navy)}.sub{margin:0 0 26px;color:var(--muted);font-size:14px;line-height:1.6}
+    label{display:block;font-size:13px;font-weight:700;margin:16px 0 8px}input{width:100%;padding:13px 14px;border:1px solid #cdd9e6;border-radius:11px;font:inherit;font-size:14px;outline:none;background:#fbfdff}input:focus{border-color:#377ec0;box-shadow:0 0 0 3px #2b78bd18}
+    button{border:0;border-radius:11px;background:var(--navy);color:white;font-weight:750;font-size:14px;padding:13px 16px;cursor:pointer;width:100%;margin-top:20px}button:hover{background:#1c568f}button:disabled{opacity:.6;cursor:wait}.secondary{background:#eef4fa;color:var(--navy);border:1px solid var(--line)}.secondary:hover{background:#e1edf8}
+    .message{display:none;border-radius:10px;padding:11px 13px;font-size:13px;line-height:1.5;margin-top:15px}.message.show{display:block}.message.error{background:#fff0ef;color:var(--red);border:1px solid #ffd7d2}.message.ok{background:#ecfdf3;color:var(--green);border:1px solid #c5f2d5}
+    .small{font-size:12px;color:var(--muted);line-height:1.6;margin-top:18px}.hidden{display:none!important}
+    .dashboard{margin-top:26px}.dashhead{display:flex;justify-content:space-between;align-items:center;gap:14px;flex-wrap:wrap}.dashhead h2{margin:0;color:var(--navy)}.dashhead button{width:auto;margin:0;padding:10px 14px}.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-top:20px}.stat{background:#fff;border:1px solid var(--line);border-radius:16px;padding:22px}.stat .label{color:var(--muted);font-size:13px}.stat strong{display:block;font-size:22px;color:var(--navy);margin-top:8px}.panel{background:#fff;border:1px solid var(--line);border-radius:16px;padding:22px;margin-top:16px}.panel h3{margin:0 0 8px}.panel p{color:var(--muted);font-size:14px;line-height:1.6;margin:0}.footer{text-align:center;color:#8190a1;font-size:12px;margin:28px 0}
+    @media(max-width:800px){main{margin:22px auto}.layout{grid-template-columns:1fr}.hero{min-height:320px;padding:28px}.card{padding:26px}.stats{grid-template-columns:1fr}.top{height:64px}}
+  </style>
+</head>
+<body>
+  <header class="top">
+    <div class="brand"><div class="logo">U</div><span>Usaha Pro</span></div>
+    <div class="tag">Platform Monitoring Usaha</div>
+  </header>
+  <main>
+    <section id="loginLayout" class="layout">
+      <div class="hero">
+        <div>
+          <div class="eyebrow">Satu kendali, banyak usaha</div>
+          <h1>Kelola usaha lebih mudah.</h1>
+          <p>Portal pusat untuk mengelola akses aplikasi usaha dari satu tempat, dengan autentikasi dan hak akses yang terjaga.</p>
+          <div class="features">
+            <div class="feature"><span class="check">✓</span> Akses terpusat untuk pengelola</div>
+            <div class="feature"><span class="check">✓</span> Pemisahan data antar aplikasi</div>
+            <div class="feature"><span class="check">✓</span> Login aman melalui Firebase</div>
+          </div>
+        </div>
+        <div class="eyebrow">USAHA PRO · SUPER ADMIN</div>
+      </div>
+      <div class="card">
+        <h2>Selamat datang</h2>
+        <p class="sub">Masuk menggunakan akun Super Admin Usaha Pro.</p>
+        <form id="loginForm">
+          <label for="email">Email</label>
+          <input id="email" type="email" autocomplete="username" placeholder="nama@contoh.com" required>
+          <label for="password">Kata sandi</label>
+          <input id="password" type="password" autocomplete="current-password" placeholder="Masukkan kata sandi" required>
+          <button id="loginBtn" type="submit">Masuk ke Usaha Pro</button>
+        </form>
+        <div id="message" class="message" role="status"></div>
+        <p class="small">Akses dashboard dibatasi untuk UID pemilik yang telah ditetapkan. Halaman ini tidak menyediakan pendaftaran pengguna umum.</p>
+      </div>
+    </section>
+
+    <section id="dashboard" class="dashboard hidden">
+      <div class="dashhead">
+        <div><div class="eyebrow" style="color:#4779a9">AREA TERLINDUNGI</div><h2>Dashboard Super Admin</h2><div id="signedInEmail" class="small"></div></div>
+        <button id="logoutBtn" class="secondary" type="button">Keluar</button>
+      </div>
+      <div class="stats">
+        <div class="stat"><div class="label">Aplikasi terdaftar</div><strong>Belum diatur</strong></div>
+        <div class="stat"><div class="label">Pengguna</div><strong>Belum dihubungkan</strong></div>
+        <div class="stat"><div class="label">Status backend</div><strong>Perlu verifikasi</strong></div>
+      </div>
+      <div class="panel"><h3>Manajemen aplikasi</h3><p>Kerangka dashboard berhasil dimuat. Daftar aplikasi, pengelolaan pengguna, dan persetujuan akun belum diaktifkan. Fitur ini baru akan dihubungkan setelah aturan akses backend dan struktur Firestore disiapkan.</p></div>
+      <div class="panel"><h3>Keamanan akun</h3><p>Login menggunakan Firebase Authentication dan akses admin diperiksa oleh Cloudflare Worker. Jangan bagikan token login atau kredensial layanan.</p></div>
+    </section>
+    <div class="footer">Usaha Pro · Portal Administrasi</div>
+  </main>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-app.js";
+    import { getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-auth.js";
+
+    // GANTI nilai di bawah dengan konfigurasi Web dari Firebase Console > Project settings.
+    const firebaseConfig = {
+      apiKey: "AIzaSyB66yINydnbda-nN5JYHc_kfdQ9MmGDMbs",
+      authDomain: "usaha-pro.firebaseapp.com",
+      projectId: "usaha-pro",
+      storageBucket: "usaha-pro.firebasestorage.app",
+      messagingSenderId: "549413990668",
+      appId: "1:549413990668:web:63dfbb8948beeb72575929"
+    };
+
+    const API_BASE = "https://usaha-pro.iroel-setyawan.workers.dev";
+    const OWNER_UID = "P2PDsmF0aQd8oZJskoi43tpJ8j32";
+    const loginLayout = document.getElementById("loginLayout");
+    const dashboard = document.getElementById("dashboard");
+    const form = document.getElementById("loginForm");
+    const loginBtn = document.getElementById("loginBtn");
+    const message = document.getElementById("message");
+
+    function showMessage(text, type = "error") {
+      message.textContent = text;
+      message.className = "message show " + type;
+    }
+
+    let app, auth;
+    try {
+      if (firebaseConfig.apiKey.startsWith("GANTI_") ||
+          firebaseConfig.authDomain.startsWith("GANTI_") ||
+          firebaseConfig.appId.startsWith("GANTI_")) {
+        showMessage("Konfigurasi Firebase Web belum diisi. Isi apiKey, authDomain, dan appId dari Firebase Console.");
+      } else {
+        app = initializeApp(firebaseConfig);
+        auth = getAuth(app);
+      }
+    } catch (e) {
+      showMessage("Konfigurasi Firebase belum dapat dimuat. Periksa kembali nilai konfigurasi Web.");
+    }
+
+    async function checkOwner(user) {
+      if (!user) {
+        loginLayout.classList.remove("hidden");
+        dashboard.classList.add("hidden");
+        return;
+      }
+      try {
+        const token = await user.getIdToken(true);
+        const response = await fetch(API_BASE + "/admin-check", {
+          method: "POST",
+          headers: {
+            "Authorization": "Bearer " + token,
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({})
+        });
+        const result = await response.json();
+        if (!response.ok || result.isSuperAdmin !== true || user.uid !== OWNER_UID) {
+          await signOut(auth);
+          loginLayout.classList.remove("hidden");
+          dashboard.classList.add("hidden");
+          showMessage("Akun berhasil dikenali, tetapi tidak memiliki akses Super Admin.");
+          return;
+        }
+        loginLayout.classList.add("hidden");
+        dashboard.classList.remove("hidden");
+        document.getElementById("signedInEmail").textContent = user.email || "Akun Super Admin";
+      } catch (e) {
+        loginLayout.classList.remove("hidden");
+        dashboard.classList.add("hidden");
+        showMessage("Tidak dapat memverifikasi akses ke backend. Periksa koneksi Worker dan konfigurasi CORS.");
+      }
+    }
+
+    form.addEventListener("submit", async (event) => {
+      event.preventDefault();
+      if (!auth) {
+        showMessage("Isi konfigurasi Firebase Web terlebih dahulu.");
+        return;
+      }
+      loginBtn.disabled = true;
+      loginBtn.textContent = "Memeriksa akun...";
+      try {
+        const credential = await signInWithEmailAndPassword(
+          auth,
+          document.getElementById("email").value.trim(),
+          document.getElementById("password").value
+        );
+        await checkOwner(credential.user);
+      } catch (e) {
+        const msg = e?.code === "auth/invalid-credential" || e?.code === "auth/wrong-password"
+          ? "Email atau kata sandi tidak sesuai."
+          : e?.code === "auth/too-many-requests"
+          ? "Terlalu banyak percobaan. Coba lagi nanti."
+          : "Login gagal. Pastikan akun terdaftar dan konfigurasi Firebase benar.";
+        showMessage(msg);
+      } finally {
+        loginBtn.disabled = false;
+        loginBtn.textContent = "Masuk ke Usaha Pro";
+      }
+    });
+
+    document.getElementById("logoutBtn").addEventListener("click", async () => {
+      if (auth) await signOut(auth);
+    });
+
+    if (auth) onAuthStateChanged(auth, checkOwner);
+  </script>
+</body>
+</html>
