@@ -34,7 +34,6 @@ label{display:block;font-size:13px;font-weight:750;margin:15px 0 7px}input,selec
 </section>
 <section id="dashboard" class="dashboard hidden">
   <div class="dashhead"><div><div class="eyebrow" style="color:#4779a9">AREA TERLINDUNGI</div><h1>Dashboard Super Admin</h1><div id="signedInEmail" class="signed"></div></div><div class="right"><button id="refreshBtn" class="secondary" type="button">↻ Muat ulang</button><button id="logoutBtn" class="secondary" type="button">Keluar</button></div></div>
-  <div class="stats"><div class="stat"><div class="label">Unit/aplikasi terdaftar</div><strong id="appCount">—</strong></div><div class="stat"><div class="label">Unit/aplikasi aktif</div><strong id="activeCount">—</strong></div><div class="stat"><div class="label">Status penyimpanan</div><strong id="storageStatus" style="font-size:18px">Menghubungkan…</strong></div></div>
   <section class="connector-section" aria-labelledby="connectorTitle">
     <button type="button" class="collapse-toggle" id="connectorToggle" aria-expanded="false" aria-controls="connectorContent"><span class="collapse-arrow" aria-hidden="true">▾</span><span><strong id="connectorTitle">Hubungkan Aplikasi</strong><span style="display:block;font-size:12px;font-weight:400;color:var(--muted);margin-top:4px">Klik untuk menyembunyikan atau menampilkan pilihan koneksi.</span></span></button>
     <div id="connectorContent" class="connector-content collapsed">
@@ -117,13 +116,6 @@ async function verifyOwner(user){
 function showDashboard(user){$("loginLayout").classList.add("hidden");$("dashboard").classList.remove("hidden");$("signedInEmail").textContent=user.email||"Akun Super Admin"}
 function showLogin(){ $("loginLayout").classList.remove("hidden");$("dashboard").classList.add("hidden")}
 function safeUrl(raw){const value=(raw||"").trim();if(!value)return "";let u;try{u=new URL(value)}catch{return null}if(!["https:","http:"].includes(u.protocol))return null;return u.href}
-function showModal(record=null){
- clearMessage($("formMessage"));$("appForm").reset();$("appId").value=record?.id||"";
- $("modalTitle").textContent=record?"Edit Aplikasi":"Tambah Aplikasi";
- $("appName").value=record?.name||"";$("appDesc").value=record?.description||"";$("appIcon").value=record?.icon||"📱";$("appStatus").value=record?.status||"active";$("appUrl").value=record?.url||"";
- $("saveAppBtn").textContent=record?"Simpan Perubahan":"Simpan Aplikasi";$("appModal").classList.remove("hidden");$("appName").focus();
-}
-function closeModal(){$("appModal").classList.add("hidden")}
 function escapeText(s){return String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]))}
 let apps=[];
 async function loadApps(){
@@ -137,35 +129,17 @@ async function loadApps(){
   }
   const fresh=await getDocs(collection(db,"apps"));
   apps=fresh.docs.map(d=>({id:d.id,...d.data()})).sort((a,b)=>(a.name||"").localeCompare(b.name||"","id"));
-  renderApps();$("storageStatus").textContent="Terhubung";$("storageStatus").style.color="var(--green)";
+  renderApps();
  }catch(e){
   $("appGrid").innerHTML="";$("appGrid").classList.remove("hidden");
   message($("dashMessage"),"Daftar aplikasi belum bisa dibaca/disimpan. Pastikan Firestore aktif dan aturan firestore.rules sudah dipasang. Detail: "+(e.code||e.message||"kesalahan tidak diketahui"));
-  $("storageStatus").textContent="Perlu aturan";$("storageStatus").style.color="var(--red)";
  }finally{$("appsLoading").classList.add("hidden")}
 }
 function renderApps(){
- $("appCount").textContent=apps.length;$("activeCount").textContent=apps.filter(a=>a.status!=="inactive").length;
- const grid=$("appGrid");grid.innerHTML="";
- if(!apps.length){grid.innerHTML='<div class="empty">Belum ada aplikasi. Klik <strong>Tambah Aplikasi</strong> untuk mulai.</div>'}
- for(const a of apps){
-  const card=document.createElement("article");card.className="appcard";
-  const status=a.status==="inactive"?"Nonaktif":"Aktif";
-  const validUrl=safeUrl(a.url||"");
-  card.innerHTML=`<div class="app-top"><div class="app-icon">${escapeText(a.icon||"📱")}</div><div style="min-width:0"><div class="app-name">${escapeText(a.name||"Tanpa nama")}</div><div class="app-desc">${escapeText(a.description||"Tidak ada deskripsi.")}</div></div></div><span class="pill ${a.status==="inactive"?"inactive":""}">${status}</span><div class="app-url">${validUrl?escapeText(validUrl):"URL belum diatur"}</div><div class="app-actions"><button type="button" class="secondary edit-btn">Edit</button><button type="button" class="primary open-btn" ${(!validUrl||a.status==="inactive")?"disabled":""}>Buka</button><button type="button" class="danger delete-btn" aria-label="Hapus ${escapeText(a.name||"aplikasi")}">Hapus</button></div>`;
-  card.querySelector(".edit-btn").addEventListener("click",()=>showModal(a));
-  card.querySelector(".open-btn").addEventListener("click",()=>{if(validUrl&&a.status!=="inactive")window.open(validUrl,"_blank","noopener,noreferrer")});
-  card.querySelector(".delete-btn").addEventListener("click",()=>removeApp(a));
-  grid.appendChild(card);
- }
- grid.classList.remove("hidden");
+  // UI Manajemen Aplikasi dihilangkan; data katalog tetap dibaca untuk kebutuhan internal.
+  $("appGrid").innerHTML="";
+  $("appGrid").classList.add("hidden");
 }
-async function removeApp(a){
- if(!confirm(`Hapus aplikasi "${a.name}" dari daftar Usaha Pro? Data di aplikasi itu tidak ikut dihapus.`))return;
- try{await deleteDoc(doc(db,"apps",a.id));message($("dashMessage"),"Aplikasi dihapus dari daftar. Data operasionalnya tidak diubah.","ok");await loadApps()}
- catch(e){message($("dashMessage"),"Gagal menghapus aplikasi. Pastikan aturan Firestore sudah benar. "+(e.code||""),"error")}
-}
-
 function setEkasirStatus(status,text){const el=$("ekasirStatus");el.className="connector-status"+(status==="connected"?" connected":status==="failed"?" failed":"");el.textContent=text}
 function localDate(d=new Date()){const y=d.getFullYear(),m=String(d.getMonth()+1).padStart(2,"0"),day=String(d.getDate()).padStart(2,"0");return `${y}-${m}-${day}`}
 function financeRange(){const now=new Date(),mode=$("financePeriod").value;let start,end;if(mode==="today")start=end=localDate(now);else if(mode==="month"){start=localDate(new Date(now.getFullYear(),now.getMonth(),1));end=localDate(now)}else{start=$("financeStart").value;end=$("financeEnd").value}return {start,end}}
@@ -221,25 +195,7 @@ onAuthStateChanged(auth,async user=>{
 });
 $("logoutBtn").addEventListener("click",async()=>{await signOut(auth);showLogin()});
 $("refreshBtn").addEventListener("click",async()=>{await loadApps();await loadFinanceSummary()});
-$("addBtn").addEventListener("click",()=>showModal());
-$("closeModal").addEventListener("click",closeModal);$("cancelModal").addEventListener("click",closeModal);
-$("appModal").addEventListener("click",e=>{if(e.target===$("appModal"))closeModal()});
-document.addEventListener("keydown",e=>{if(e.key==="Escape"){closeModal();closeConnectModal()}});
-$("appForm").addEventListener("submit",async event=>{
- event.preventDefault();if(saveBusy)return;
- const name=$("appName").value.trim(),description=$("appDesc").value.trim(),icon=$("appIcon").value.trim()||"📱",status=$("appStatus").value,url=safeUrl($("appUrl").value);
- if(!name){message($("formMessage"),"Nama aplikasi wajib diisi.");return}
- if(url===null){message($("formMessage"),"URL tidak valid. Gunakan alamat yang diawali https:// atau http://.");return}
- saveBusy=true;$("saveAppBtn").disabled=true;$("saveAppBtn").textContent="Menyimpan…";
- try{
-  const id=$("appId").value;
-  const data={name,description,icon,url,status,updatedAt:serverTimestamp()};
-  if(id)await updateDoc(doc(db,"apps",id),data);
-  else await addDoc(collection(db,"apps"),{...data,createdAt:serverTimestamp()});
-  closeModal();message($("dashMessage"),id?"Perubahan aplikasi berhasil disimpan.":"Aplikasi baru berhasil ditambahkan.","ok");await loadApps()
- }catch(e){message($("formMessage"),"Gagal menyimpan. Pastikan aturan Firestore sudah dipasang. "+(e.code||e.message||""))}
- finally{saveBusy=false;$("saveAppBtn").disabled=false;$("saveAppBtn").textContent=$("appId").value?"Simpan Perubahan":"Simpan Aplikasi"}
-});
+
 </script>
 </body>
 </html>
