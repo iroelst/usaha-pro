@@ -53,7 +53,7 @@ label{display:block;font-size:13px;font-weight:750;margin:15px 0 7px}input,selec
   </section>
 
   <section class="finance-section" aria-labelledby="financeTitle">
-    <div class="finance-toolbar"><div><h2 id="financeTitle">Ringkasan Keuangan e-Kasir</h2><p>Ringkasan saja, tanpa rincian transaksi. Data diambil dari e-Kasir secara baca-saja.</p></div>
+    <div class="finance-toolbar"><div><h2 id="financeTitle">Ringkasan Keseluruhan</h2><p>Gabungan metrik keuangan dari unit usaha yang sudah terhubung. Saat ini sumber data tersedia dari e-Kasir.</p><div style="margin-top:10px"><button id="renameUnitBtn" type="button" class="secondary">✎ Rename Unit Usaha</button></div></div>
       <div class="finance-filters">
         <div><label for="financePeriod">Periode</label><select id="financePeriod"><option value="today">Hari ini</option><option value="month" selected>Bulan ini</option><option value="custom">Rentang tanggal</option></select></div>
         <div id="financeStartWrap" class="hidden"><label for="financeStart">Dari tanggal</label><input type="date" id="financeStart"></div>
@@ -136,19 +136,48 @@ async function loadApps(){
  }finally{$("appsLoading").classList.add("hidden")}
 }
 function renderApps(){
-  // UI Manajemen Aplikasi dihilangkan; data katalog tetap dibaca untuk kebutuhan internal.
+  // Daftar aplikasi tidak ditampilkan di dashboard; data tetap dipakai untuk nama unit usaha.
   $("appGrid").innerHTML="";
   $("appGrid").classList.add("hidden");
+  const unit=apps.find(a=>a.id==="ekasir")||apps.find(a=>(a.name||"").toLowerCase().includes("kasir"));
+  if(unit){
+    const title=unit.unitName||unit.name||"Unit Usaha";
+    $("financeTitle").textContent="Ringkasan Keseluruhan — "+title;
+    $("renameUnitBtn").dataset.unitId=unit.id;
+    $("renameUnitBtn").dataset.unitName=title;
+  }
 }
 function setEkasirStatus(status,text){const el=$("ekasirStatus");el.className="connector-status"+(status==="connected"?" connected":status==="failed"?" failed":"");el.textContent=text}
 function localDate(d=new Date()){const y=d.getFullYear(),m=String(d.getMonth()+1).padStart(2,"0"),day=String(d.getDate()).padStart(2,"0");return `${y}-${m}-${day}`}
 function financeRange(){const now=new Date(),mode=$("financePeriod").value;let start,end;if(mode==="today")start=end=localDate(now);else if(mode==="month"){start=localDate(new Date(now.getFullYear(),now.getMonth(),1));end=localDate(now)}else{start=$("financeStart").value;end=$("financeEnd").value}return {start,end}}
 function rupiah(v){return Number.isFinite(Number(v))?"Rp "+Number(v).toLocaleString("id-ID"):"—"}
 function firstNumber(obj,keys){for(const key of keys){if(obj[key]!==undefined&&obj[key]!==null&&obj[key]!=="")return Number(obj[key])}return null}
-function paintFinance(data){const fields={finOmzet:["omzet","totalOmzet","salesTotal"],finReceived:["uangDiterima","totalDiterima","paidTotal","received","totalPaid"],finDue:["sisaTagihan","totalTagihan","outstanding","unpaidTotal","dueTotal"],finHpp:["hpp","totalHpp","totalHPP"],finGross:["labaKotor","grossProfit"],finExpenses:["pengeluaran","totalPengeluaran","expensesTotal"],finNet:["labaBersih","netProfit"]};for(const [id,keys] of Object.entries(fields)){const n=firstNumber(data,keys);$(id).textContent=n===null?"—":rupiah(n)}const count=firstNumber(data,["transactionCount","jumlahTransaksi","totalTransaksi"]);$("finCount").textContent=count===null?"—":count.toLocaleString("id-ID");$("finTransactions").textContent=count===null?"Ringkasan periode terpilih":`${count.toLocaleString("id-ID")} transaksi pada periode ini`;const missing=Object.values(fields).some(keys=>firstNumber(data,keys)===null);$("financeMessage").className="finance-help";$("financeMessage").textContent=missing?"Data ringkasan berhasil dimuat, tetapi sebagian metrik belum disediakan endpoint Worker. Nilai yang belum tersedia ditampilkan sebagai — agar tidak menampilkan angka perkiraan.":"Ringkasan keuangan berhasil diperbarui."}
+function paintFinance(data){const fields={finOmzet:["omzet","totalOmzet","salesTotal"],finReceived:["uangDiterima","totalDiterima","paidTotal","received","totalPaid"],finDue:["sisaTagihan","totalTagihan","outstanding","unpaidTotal","dueTotal"],finHpp:["hpp","totalHpp","totalHPP"],finGross:["labaKotor","grossProfit"],finExpenses:["pengeluaran","totalPengeluaran","expensesTotal"],finNet:["labaBersih","netProfit"]};for(const [id,keys] of Object.entries(fields)){const n=firstNumber(data,keys);$(id).textContent=n===null?"—":rupiah(n)}const count=firstNumber(data,["transactionCount","jumlahTransaksi","totalTransaksi"]);$("finCount").textContent=count===null?"—":count.toLocaleString("id-ID");$("finTransactions").textContent=count===null?"Ringkasan periode terpilih":`${count.toLocaleString("id-ID")} transaksi pada periode ini`;const missing=Object.values(fields).some(keys=>firstNumber(data,keys)===null);$("financeMessage").className="finance-help";$("financeMessage").textContent=(missing?"Sebagian metrik tidak disediakan oleh sumber data dan ditampilkan sebagai —. ":"")+"Ringkasan keseluruhan saat ini mencakup unit usaha yang sudah terhubung dan tersedia datanya (e-Kasir). Unit lain akan masuk setelah koneksinya tersedia."}
 async function loadFinanceSummary(){const btn=$("financeRefreshBtn");const {start,end}=financeRange();if(!start||!end){message($("financeMessage"),"Pilih tanggal awal dan akhir periode.");return}if(start>end){message($("financeMessage"),"Tanggal awal tidak boleh melewati tanggal akhir.");return}btn.disabled=true;btn.textContent="Memuat…";$("financeMessage").className="finance-help";$("financeMessage").textContent="Mengambil ringkasan keuangan…";try{const data=await workerRequest("/ekasir-summary?startDate="+encodeURIComponent(start)+"&endDate="+encodeURIComponent(end),{method:"GET"});paintFinance(data)}catch(e){$("financeMessage").className="finance-help finance-error";$("financeMessage").textContent=e.message||"Ringkasan belum dapat dimuat. Pastikan e-Kasir sudah terhubung.";for(const id of ["finOmzet","finReceived","finDue","finHpp","finGross","finExpenses","finNet","finCount","finTransactions"])$(id).textContent="—"}finally{btn.disabled=false;btn.textContent="Tampilkan"}}
 $("financePeriod").addEventListener("change",()=>{const custom=$("financePeriod").value==="custom";$("financeStartWrap").classList.toggle("hidden",!custom);$("financeEndWrap").classList.toggle("hidden",!custom);if(custom){const r=financeRange();$("financeStart").value=r.start;$("financeEnd").value=r.end}});
 $("financeRefreshBtn").addEventListener("click",loadFinanceSummary);
+
+$("renameUnitBtn").addEventListener("click",async()=>{
+ const btn=$("renameUnitBtn"),unitId=btn.dataset.unitId;
+ if(!unitId){message($("financeMessage"),"Data unit usaha belum dimuat. Muat ulang dashboard lalu coba lagi.");return}
+ const current=btn.dataset.unitName||"Unit Usaha";
+ const next=prompt("Masukkan nama unit usaha:",current);
+ if(next===null)return;
+ const unitName=next.trim();
+ if(!unitName){message($("financeMessage"),"Nama unit usaha tidak boleh kosong.");return}
+ btn.disabled=true;btn.textContent="Menyimpan nama…";
+ try{
+  await updateDoc(doc(db,"apps",unitId),{unitName,updatedAt:serverTimestamp()});
+  const unit=apps.find(a=>a.id===unitId);if(unit)unit.unitName=unitName;
+  $("financeTitle").textContent="Ringkasan Keseluruhan — "+unitName;
+  btn.dataset.unitName=unitName;
+  $("financeMessage").className="finance-help";
+  $("financeMessage").textContent="Nama unit usaha berhasil diperbarui dan tersimpan di Firebase.";
+ }catch(e){
+  message($("financeMessage"),"Nama unit usaha gagal disimpan. Periksa aturan Firestore. "+(e.code||e.message||""));
+ }finally{btn.disabled=false;btn.textContent="✎ Rename Unit Usaha"}
+});
+
 function showConnectModal(){clearMessage($("connectFormMessage"));$("connectForm").reset();$("ekasirEmail").value="bumdes@ekasir.com";$("connectModal").classList.remove("hidden");$("ekasirEmail").focus()}
 function closeConnectModal(){$("connectModal").classList.add("hidden");$("ekasirPassword").value=""}
 async function workerRequest(path,options={}){
